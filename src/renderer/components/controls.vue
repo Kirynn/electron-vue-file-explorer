@@ -17,6 +17,7 @@
 
 <script>
 
+
     const nodePath = require('path')
 
     import clickAway from '../directives/clickAway'
@@ -49,6 +50,13 @@
             },
 
             submit() {
+
+                if (this.tryPath.length === 1) {
+                    
+                    this.tryPath = this.tryPath.toUpperCase()
+                    this.tryPath += ':\\'
+                }
+                else if (this.tryPath[this.tryPath.length] != '\\') this.tryPath += '\\'
 
                 this.$store.commit('SET_TRY', this.tryPath)
                 this.tryPath = ''

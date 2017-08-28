@@ -20,6 +20,8 @@ export default {
 
 <style lang='scss'>
 
+    @import './assets/flx-table';
+
     * {
   
           margin: 0px;
