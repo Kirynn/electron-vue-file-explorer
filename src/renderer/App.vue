@@ -73,4 +73,9 @@ export default {
         cursor: default;
     }
 
+    .no-user-select {
+
+        -webkit-user-select: none;
+    }
+
 </style>

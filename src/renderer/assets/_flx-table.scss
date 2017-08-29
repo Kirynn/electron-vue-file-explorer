@@ -22,11 +22,6 @@
             flex-flow: row nowrap;
             flex-grow: 1;
             flex-basis: 0;
-
-            &[data-type="name"] {
-
-                flex-grow: 2;
-            }
         }
     }
 }
