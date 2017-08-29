@@ -36,7 +36,8 @@
             ...mapState({
                 toggleModal: state => state.windowData.showModal,
             })
-        }
+        },
+        directives: {clickAway}
     }
 </script>
 

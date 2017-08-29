@@ -1,6 +1,6 @@
 <template>
     <main class="no-user-select">
-        <modal></modal>
+        <modal v-bind:message="modalMsg" v-if="modalOpen"></modal>
         <div class="table-container">
             <section class="flx-table">
                 <div class="flx-table-row flx-table-header">
@@ -13,9 +13,11 @@
                 <div class="flx-table-row"
                      v-for="folder in systemObjects.folders"
                      v-bind:key="folder.id"
+                     v-bind:data-path="folder.name"
                      v-on:dblclick="folderOpen(folder.name)"
                      v-on:click.stop="select($event)"
-                     data-selected=false>
+                     data-selected=false
+                     >
                     <object v-bind:data="icons.folder" class="flx-table-row-item" data-type="icon"></object>
                     <div class="flx-table-row-item" data-type="name">{{folder.name}}</div>
                     <div class="flx-table-row-item">{{folder.type}}</div>
@@ -25,6 +27,7 @@
                 <div class="flx-table-row"
                      v-for="file in systemObjects.files"
                      v-bind:key="file.id"
+                     v-bind:data-path="file.name"
                      v-on:dblclick="fileOpen(file.path)"
                      v-on:click.stop="select($event)"
                      data-selected=false>
@@ -62,7 +65,8 @@
                 icons: {
                     folder: 'static/icons/Folder-Main.svg',
                     file: 'static/icons/File-Main.svg'
-                }
+                },
+                contextMenu: null
             }
         },
         computed: {
@@ -76,6 +80,24 @@
             }),
 
             systemObjects() {
+
+                let fileStruct = this.genFileStruct()
+
+                fs.watch(this.currentPath, (eventType, filename) => {
+                    
+                    if (filename) this.$store.dispatch('reload')
+                })
+
+                return {
+
+                    files: fileStruct.files,
+                    folders: fileStruct.folders
+                }
+            }
+        },
+        methods: {
+
+            genFileStruct() {
 
                 let listOfFiles = []
                 let listOfFolders = []
@@ -115,10 +137,7 @@
                                  else sizeString += sizeWorking.charAt(i)
                             }
 
-                            sizeString = sizeString.split('').reverse().join('')
-                            // if (sizeString.charAt(sizeString.length - 1) === ' ') sizeString = sizeString.substring(0, sizeString.length - 2)
-
-                            sizeString += ' KB'
+                            sizeString = sizeString.split('').reverse().join('') + ' KB'
 
                             listOfFiles.push({
 
@@ -133,15 +152,14 @@
                         id++
                     }
                 })
-
+                
                 return {
 
                     files: listOfFiles,
                     folders: listOfFolders
                 }
-            }
-        },
-        methods: {
+
+            },
 
             folderOpen(file) {
                 
@@ -173,6 +191,11 @@
                 el.setAttribute('data-selected', true)
                 el.classList.add('selected')
 
+                let els = document.querySelectorAll("[data-selected='true']")
+
+                if (els.length >= 1) {
+                      this.contextMenu.items[1].visible = true
+                }
             }
 
         },
@@ -187,7 +210,62 @@
 
         },
         mounted() {
-            
+
+            let Vue = this
+
+            const {Menu, MenuItem} = this.$electron.remote
+
+            Vue.contextMenu = new Menu()
+
+            Vue.contextMenu.append(new MenuItem({
+
+                label: 'New Folder',
+                click() {
+                    
+                    let name = 'New Folder'
+                    let i = 1
+
+                    console.log(fs.existsSync(path.join(Vue.currentPath, name), name))
+
+                    while(fs.existsSync(path.join(Vue.currentPath, name))) {
+
+                        name = `New Folder (${i})`
+                        i++
+                    }
+
+                    fs.mkdir(`${path.join(Vue.currentPath, name)}`, () => {return false})
+                }
+            }))
+
+            Vue.contextMenu.append(new MenuItem({
+
+                label: 'Delete',
+                visible: false,
+                click() {
+
+                    let selected = document.querySelectorAll("[data-selected='true']")
+                    Vue.$store.dispatch('setModalMsg', `Are you sure you want to delete these (${selected.length}) file(s)?`)
+                    Vue.$store.dispatch('toggleModal', 'main')
+                    Vue.$events.on('modal-response', (response) => {
+
+                        if (response) {
+                            
+                            selected.forEach((selectedFile) => {
+
+                                selectedFile.classList.remove('selected')
+                                Vue.contextMenu.items[1].visible = false
+                                Vue.$electron.shell.moveItemToTrash(path.join(Vue.currentPath, selectedFile.getAttribute("data-path")))
+                            })
+                        }
+                    })
+                }
+            }))
+
+            window.addEventListener('contextmenu', (event) => {
+                event.preventDefault()
+                Vue.contextMenu.popup(this.$electron.remote.getCurrentWindow())
+            }, false)
+
         }
     }
 </script>
