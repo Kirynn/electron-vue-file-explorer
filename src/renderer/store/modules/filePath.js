@@ -73,7 +73,6 @@ const actions = {
 
         return new Promise((resolve, reject) => {
             commit('SET', newPath)
-            console.log(state.root)
             resolve()
             reject()
         })

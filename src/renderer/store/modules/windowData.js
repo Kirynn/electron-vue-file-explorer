@@ -28,7 +28,7 @@ const actions = {
 
     toggleModal({commit}, name = undefined) {
 
-        if (name) console.log(name)
+        // if (name) console.log(name)
         commit('TOGGLE_MODAL')
     }
 }

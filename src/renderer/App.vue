@@ -21,6 +21,7 @@ export default {
 <style lang='scss'>
 
     @import './assets/flx-table';
+    @import './assets/ui';
 
     * {
   
@@ -59,11 +60,6 @@ export default {
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        
-        // & > * {
-
-        //     flex: 1 1 auto;
-        // }
     }
 
     .router-link:link {

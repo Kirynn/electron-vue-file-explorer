@@ -193,9 +193,9 @@
 
                 let els = document.querySelectorAll("[data-selected='true']")
 
-                if (els.length >= 1) {
-                      this.contextMenu.items[1].visible = true
-                }
+                if (els.length >= 1) this.contextMenu.items[1].visible = true
+                if (els.length === 1) this.contextMenu.items[2].visible = true
+
             }
 
         },
@@ -211,6 +211,9 @@
         },
         mounted() {
 
+            this.$store.dispatch('setModalMsg', `Test Text`)
+            this.$store.dispatch('toggleModal')
+
             let Vue = this
 
             const {Menu, MenuItem} = this.$electron.remote
@@ -224,8 +227,6 @@
                     
                     let name = 'New Folder'
                     let i = 1
-
-                    console.log(fs.existsSync(path.join(Vue.currentPath, name), name))
 
                     while(fs.existsSync(path.join(Vue.currentPath, name))) {
 
@@ -258,6 +259,24 @@
                             })
                         }
                     })
+                }
+            }))
+            
+            Vue.contextMenu.append(new MenuItem ({
+
+                label: 'Rename',
+                visible: false,
+                click() {
+
+                    let selected = document.querySelectorAll("[data-selected='true']")
+
+                    let currentPath = Vue.currentPath
+                    let oldPath = path.join(currentPath, selected[0].getAttribute('data-path'))
+                    let newPath = path.join(currentPath, 'renamed')
+
+                    fs.renameSync(oldPath, newPath)
+
+                    Vue.contextMenu.items[2].visible = false
                 }
             }))
 
