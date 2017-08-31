@@ -1,0 +1,27 @@
+.flx-table {
+
+    display: flex;
+    flex-direction: column;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+
+    .flx-table-header {
+
+        padding-bottom: 0.5em;
+    }
+
+    .flx-table-row {
+
+        width: 100%;
+        display: flex;
+        flex-flow: row nowrap;
+
+        .flx-table-row-item {
+            
+            display: flex;
+            flex-flow: row nowrap;
+            flex-grow: 1;
+            flex-basis: 0;
+        }
+    }
+}

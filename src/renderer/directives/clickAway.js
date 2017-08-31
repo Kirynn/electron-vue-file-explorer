@@ -1,6 +1,6 @@
 import Vue from 'vue'
 
-export const clickAway = {
+const clickAway = {
         
     bind: function(el, bind, vNode) {
         
@@ -28,5 +28,7 @@ export const clickAway = {
         el.__vueClickOutside__ = null;
     }
 }
+
+export default clickAway
 
 Vue.directive('clickAway', clickAway)

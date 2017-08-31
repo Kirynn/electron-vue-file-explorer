@@ -17,6 +17,7 @@
 
 <script>
 
+
     const nodePath = require('path')
 
     import clickAway from '../directives/clickAway'
@@ -49,6 +50,13 @@
             },
 
             submit() {
+
+                if (this.tryPath.length === 1) {
+                    
+                    this.tryPath = this.tryPath.toUpperCase()
+                    this.tryPath += ':\\'
+                }
+                else if (this.tryPath[this.tryPath.length] != '\\') this.tryPath += '\\'
 
                 this.$store.commit('SET_TRY', this.tryPath)
                 this.tryPath = ''
@@ -86,7 +94,8 @@
                 if (this.backwardPath.length <= 0) this.canGoBackwards = false
                 else this.canGoBackwards = true
 
-                return nodePath.win32.normalize(this.path)
+                this.tryPath = nodePath.normalize(this.tryPath)
+                return nodePath.normalize(this.path)
             }
         },
     }

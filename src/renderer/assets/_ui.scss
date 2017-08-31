@@ -1,0 +1,43 @@
+.ui-btn {
+
+    position: relative;
+    vertical-align: middle;
+    display: inline-block;
+    border: 2px solid lightblue;
+    transition: all 0.4s ease;
+    overflow: hidden;
+    margin: 1rem auto;
+    width: 100%;
+    max-width: 5rem;
+    height: 2em;
+    font-size: 32px;
+    border: 1px solid blue;
+    cursor: pointer;
+    transition: all 0.4s ease-in-out;
+    z-index: 5;
+    line-height: 55px;
+
+    &:before {
+
+        content: '';
+        position: absolute;
+        right: -50px;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        border-right: 50px solid transparent;
+        border-bottom: 2em solid blue;
+        transform: translateX(-100%);
+        transition: all 0.4s ease-in-out;
+    }
+
+    &:hover {
+
+        color: white;
+
+        &:before {
+            
+            transform: translateX(0);
+        }
+    }
+}

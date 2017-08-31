@@ -20,6 +20,9 @@ export default {
 
 <style lang='scss'>
 
+    @import './assets/flx-table';
+    @import './assets/ui';
+
     * {
   
           margin: 0px;
@@ -57,11 +60,6 @@ export default {
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        
-        // & > * {
-
-        //     flex: 1 1 auto;
-        // }
     }
 
     .router-link:link {
@@ -69,6 +67,11 @@ export default {
         color: black;
         text-decoration: none;
         cursor: default;
+    }
+
+    .no-user-select {
+
+        -webkit-user-select: none;
     }
 
 </style>

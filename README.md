@@ -1,6 +1,8 @@
-# my-project
+# File-Explorer Feat. Electron & Vue 
 
-> An electron-vue project
+> A file explorer build using: Electron & Vue.js
+> Only tested for windows
+
 
 #### Build Setup
 

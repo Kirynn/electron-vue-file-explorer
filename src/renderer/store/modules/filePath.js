@@ -9,6 +9,11 @@ const state = {
 
 const mutations = {
 
+    RELOAD(state) {
+
+        state.currentPath = state.currentPath + '\\'
+    },
+
     UPDATE_PATH(state, newPath) {
 
         state.backwardPath.push(state.currentPath)
@@ -68,10 +73,14 @@ const actions = {
 
         return new Promise((resolve, reject) => {
             commit('SET', newPath)
-            console.log(state.root)
             resolve()
             reject()
         })
+    },
+
+    reload({commit}) {
+
+        commit('RELOAD')
     }
 }
 
