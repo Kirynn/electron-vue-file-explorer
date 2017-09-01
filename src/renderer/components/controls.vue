@@ -94,7 +94,7 @@
                 if (this.backwardPath.length <= 0) this.canGoBackwards = false
                 else this.canGoBackwards = true
 
-                this.tryPath = nodePath.normalize(this.tryPath)
+                //this.tryPath = nodePath.normalize(this.tryPath)
                 return nodePath.normalize(this.path)
             }
         },

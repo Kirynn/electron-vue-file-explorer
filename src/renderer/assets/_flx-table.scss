@@ -16,7 +16,7 @@
         display: flex;
         flex-flow: row nowrap;
 
-        .flx-table-row-item {
+        .flx-table-row-item, & > *{
             
             display: flex;
             flex-flow: row nowrap;
