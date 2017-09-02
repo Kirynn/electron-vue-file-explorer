@@ -2,7 +2,8 @@ const state = {
 
     modalMsg: '',
     showModal: false,
-    currentEventStream: {locked: true, user: null}
+    currentEventStream: {locked: false, user: null},
+    objectList: [],
 }
 
 const mutations = {
@@ -23,6 +24,12 @@ const mutations = {
 
         state.currentEventStream.locked = locked
         state.currentEventStream.user = user
+    },
+
+    SET_OBJECT_LIST(state, objects) {
+
+        state.objectList = null
+        state.objectList = objects
     }
 }
 
@@ -43,12 +50,22 @@ const actions = {
 
         commit('SET_EVENT_STREAM', data.locked, data.user)
         
-        console.log(`Event stream ${data.locked ? 'is locked' : 'is unlocked'}  ${data.user ? 'by ' + data.user : ''}`)
-    }
+        console.info(`Event stream ${data.locked ? 'is locked' : 'is unlocked'} ${data.user ? 'by ' + data.user : ''}`)
+    },
+
+    setObjectList({commit}, objects) {
+
+        commit('SET_OBJECT_LIST', objects)
+    },
+}
+
+const getters = {
+
 }
 
 export default {
     state,
     mutations,
-    actions
+    actions,
+    getters
 }

@@ -48,6 +48,14 @@
                 locked: true,
                 user: 'modal'
             })
+        },
+        destroyed() {
+
+            this.$store.dispatch({
+                    type: 'setEventStream',
+                    locked: false,
+                    user: undefined
+            })
         }
     }
 </script>
