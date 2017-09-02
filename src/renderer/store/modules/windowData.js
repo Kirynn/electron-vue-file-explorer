@@ -1,7 +1,8 @@
 const state = {
 
     modalMsg: '',
-    showModal: false
+    showModal: false,
+    currentEventStream: {locked: true, user: null}
 }
 
 const mutations = {
@@ -16,6 +17,12 @@ const mutations = {
         state.showModal = !state.showModal
         
         if (!state.showModal) state.modalMsg = ''
+    },
+
+    SET_EVENT_STREAM(state, locked, user) {
+
+        state.currentEventStream.locked = locked
+        state.currentEventStream.user = user
     }
 }
 
@@ -30,6 +37,13 @@ const actions = {
 
         // if (name) console.log(name)
         commit('TOGGLE_MODAL')
+    },
+
+    setEventStream({commit}, data) {
+
+        commit('SET_EVENT_STREAM', data.locked, data.user)
+        
+        console.log(`Event stream ${data.locked ? 'is locked' : 'is unlocked'}  ${data.user ? 'by ' + data.user : ''}`)
     }
 }
 

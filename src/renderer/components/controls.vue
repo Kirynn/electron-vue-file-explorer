@@ -81,7 +81,8 @@
                 root: state => state.filePath.root,
                 backwardPath: state => state.filePath.backwardPath,
                 forwardPath: state => state.filePath.forwardPath,
-                try: state => state.filePath.try
+                try: state => state.filePath.try,
+                currentEventStream: state => state.windowData.currentEventStream
             }),
 
             currentPath() {

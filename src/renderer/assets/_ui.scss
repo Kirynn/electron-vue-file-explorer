@@ -8,7 +8,7 @@
     overflow: hidden;
     margin: 1rem auto;
     width: 100%;
-    max-width: 5rem;
+    max-width: 7rem;
     height: 2em;
     font-size: 32px;
     border: 1px solid blue;
@@ -16,6 +16,8 @@
     transition: all 0.4s ease-in-out;
     z-index: 5;
     line-height: 55px;
+    margin-bottom: 5em;
+    text-align: center;
 
     &:before {
 

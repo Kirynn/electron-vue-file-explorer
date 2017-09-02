@@ -76,7 +76,8 @@
                 currentPath: state => path.win32.normalize(state.filePath.currentPath),
                 tryPath: state => path.win32.normalize(state.filePath.try, '.'),
                 modalMsg: state => state.windowData.modalMsg,
-                modalOpen: state => state.windowData.showModal
+                modalOpen: state => state.windowData.showModal,
+                currentEventStream: state => state.windowData.currentEventStream
             }),
 
             systemObjects() {
@@ -279,12 +280,15 @@
                     Vue.contextMenu.items[2].visible = false
                 }
             }))
-
+    
             window.addEventListener('contextmenu', (event) => {
-                event.preventDefault()
-                Vue.contextMenu.popup(this.$electron.remote.getCurrentWindow())
-            }, false)
 
+                if (!this.currentEventStream.locked) {
+
+                    event.preventDefault()
+                    Vue.contextMenu.popup(this.$electron.remote.getCurrentWindow())
+                }
+            }, false)
         }
     }
 </script>

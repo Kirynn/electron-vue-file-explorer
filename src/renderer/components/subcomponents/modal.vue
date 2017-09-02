@@ -37,9 +37,18 @@
 
             ...mapState({
                 toggleModal: state => state.windowData.showModal,
+                currentEventStream: state => state.windowData.currentEventStream
             })
         },
-        directives: {clickAway}
+        directives: {clickAway},
+        mounted() {
+
+            this.$store.dispatch({
+                type: 'setEventStream',
+                locked: true,
+                user: 'modal'
+            })
+        }
     }
 </script>
 
