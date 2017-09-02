@@ -1,3 +1,5 @@
+const path = require('path')
+
 const state = {
 
     currentPath: 'D:\\',
@@ -11,7 +13,9 @@ const mutations = {
 
     RELOAD(state) {
 
-        state.currentPath = state.currentPath + '\\'
+        let reset = state.currentPath
+        state.currentPath = ''
+        state.currentPath = reset
     },
 
     UPDATE_PATH(state, newPath) {

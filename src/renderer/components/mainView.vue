@@ -60,7 +60,15 @@
                     'MSOCache',
                     'pagefile.sys',
                     'System Volume Information'],
-                contextMenu: null
+                contextMenu: null,
+                selectedEls: {
+                    els: [],
+                    getSelectedEls: function() {
+
+                        if (this.els.length === 1) return this.els[0]
+                        else return this.els
+                    }
+                }
             }
         },
         computed: {
@@ -71,7 +79,8 @@
                 tryPath: state => path.win32.normalize(state.filePath.try, '.'),
                 modalMsg: state => state.windowData.modalMsg,
                 modalOpen: state => state.windowData.showModal,
-                currentEventStream: state => state.windowData.currentEventStream
+                currentEventStream: state => state.windowData.currentEventStream,
+                objectList: state => state.windowData.objectList
             }),
 
             systemObjects() {
@@ -83,11 +92,11 @@
                     if (filename) this.$store.dispatch('reload')
                 })
 
-                return {
+                this.$store.dispatch(`setObjectList`, fileStruct)
 
-                    files: fileStruct.files,
-                    folders: fileStruct.folders
-                }
+                this.container = fileStruct
+
+                return fileStruct
             }
         },
         methods: {
@@ -160,49 +169,55 @@
 
             folderOpen(file) { 
 
-                console.log(file)
-                this.$store.dispatch('updatePath', this.currentPath + `${file}\\`)
+                if (!this.currentEventStream.locked && this.$store.getters.selectedLength === 1) this.$store.dispatch('updatePath', this.currentPath + `${file}\\`)
             },
 
             fileOpen(file) {
 
-                this.$electron.shell.openItem(path.join(this.currentPath, file))
+                if (!this.currentEventStream.locked && this.$store.getters.selectedLength === 1) this.$electron.shell.openItem(path.join(this.currentPath, file))
             },
 
             select(event) {
 
-                let el = event.target
+                if (!this.currentEventStream.locked) {
 
-                while (!el.classList.contains('flx-table-row')) el = el.parentNode
+                    let el = event.target
 
-                if (!event.ctrlKey) {
+                    while (!el.classList.contains('flx-table-row')) el = el.parentNode
+
+                    if (!event.ctrlKey) {
+
+                        let els = document.querySelectorAll("[data-selected='true']")
+                        
+                        this.selectedEls.els = []
+
+                        els.forEach((el) => {
+
+                            el.setAttribute('data-selected', false)
+                            el.classList.remove('selected')
+                        })
+                    }
+
+                    el.setAttribute('data-selected', true)
+                    el.classList.add('selected')
+                
+                    this.selectedEls.els.push(el)
 
                     let els = document.querySelectorAll("[data-selected='true']")
-                    
-                    els.forEach((el) => {
 
-                        el.setAttribute('data-selected', false)
-                        el.classList.remove('selected')
-                    })
+                    if (els.length >= 1) this.contextMenu.items[1].visible = true   //Delete Option
+                    if (els.length === 1) this.contextMenu.items[2].visible = true  //Rename option
                 }
-
-                el.setAttribute('data-selected', true)
-                el.classList.add('selected')
-
-                let els = document.querySelectorAll("[data-selected='true']")
-
-                if (els.length >= 1) this.contextMenu.items[1].visible = true
-                if (els.length === 1) this.contextMenu.items[2].visible = true
-
             },
 
-            rename(el) {
-                
-                console.log('1:', el)
-                el = el[0]
-                let x = el.getAttribute("data-path")
-                this.$events.emit(x, 'response')
-                
+            rename(selectedEl, callback) {
+
+                // Send an event to the element using its [data-path] attribute
+                this.$events.emit(selectedEl.getAttribute("data-path"), 'reaname')
+                this.$events.on('rename', (response) => {
+                    
+                    return callback(response)
+                })
             }
         },
         watch: {
@@ -211,7 +226,6 @@
 
                 if (fs.existsSync(this.tryPath)) this.$store.dispatch('sendTo', this.tryPath)
                 else this.$electron.shell.beep()
-                
             }
 
         },
@@ -270,18 +284,39 @@
                 label: 'Rename',
                 visible: false,
                 click() {
+                    
+                    let currentPath = Vue.currentPath
+                    let oldPath = path.join(currentPath, Vue.selectedEls.getSelectedEls().getAttribute('data-path'))
 
-                    let selected = document.querySelectorAll("[data-selected='true']")
+                    Vue.rename(Vue.selectedEls.getSelectedEls(), (newName) => {
+                        
+                        let check = true
+                        
+                        if (newName === null) {
+                            
+                            check = false
+                        }
 
-                    Vue.rename(selected)
+                        else {
+                            
+                            for (let obj in Vue.container) {
 
-                    // let currentPath = Vue.currentPath
-                    // let oldPath = path.join(currentPath, selected[0].getAttribute('data-path'))
-                    // let newPath = path.join(currentPath, this.rename())
+                                for (let entity in Vue.container[obj]) {
 
-                    // fs.renameSync(oldPath, newPath)
+                                    if (Vue.container[obj][entity].name === newName) {
 
-                    // Vue.contextMenu.items[2].visible = false
+                                        Vue.$store.dispatch('setModalMsg', 'A file with this name already exists')
+                                        Vue.$store.dispatch('toggleModal')
+
+                                        check = false
+                                    }
+                                }
+                            }
+                        }
+                        if (check) fs.renameSync(oldPath, path.join(currentPath, newName))
+                    })
+
+                    Vue.contextMenu.items[2].visible = false
                 }
             }))
     

@@ -31,8 +31,8 @@
             return {
                 canGoForwards: false,
                 canGoBackwards: false,
-                tryPath: '',
-                typing: false
+                typing: false,
+                tryPath: ''
             }
         },
         methods: {
@@ -56,10 +56,13 @@
                     this.tryPath = this.tryPath.toUpperCase()
                     this.tryPath += ':\\'
                 }
-                else if (this.tryPath[this.tryPath.length] != '\\') this.tryPath += '\\'
+                else if (this.tryPath[this.tryPath.length] != '\\') {
+                    
+                    this.tryPath += '\\'
+                }
 
                 this.$store.commit('SET_TRY', this.tryPath)
-                this.tryPath = ''
+                this.tryPath = this.path
             },
 
             clickedOff() {
@@ -95,9 +98,8 @@
                 if (this.backwardPath.length <= 0) this.canGoBackwards = false
                 else this.canGoBackwards = true
 
-                //this.tryPath = nodePath.normalize(this.tryPath)
                 return nodePath.normalize(this.path)
-            }
+            },
         },
     }
 </script>
