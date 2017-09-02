@@ -10,33 +10,21 @@
                     <div class="flx-table-row-item" data-type="size">Size</div>
                     <div class="flx-table-row-item"></div>
                 </div>
-                <div class="flx-table-row"
-                     v-for="folder in systemObjects.folders"
-                     v-bind:key="folder.id"
-                     v-bind:data-path="folder.name"
-                     v-on:dblclick="folderOpen(folder.name)"
-                     v-on:click.stop="select($event)"
-                     data-selected=false
-                     >
-                    <object v-bind:data="icons.folder" class="flx-table-row-item" data-type="icon"></object>
-                    <div class="flx-table-row-item" data-type="name">{{folder.name}}</div>
-                    <div class="flx-table-row-item">{{folder.type}}</div>
-                    <div class="flx-table-row-item"></div>
-                    <div class="flx-table-row-item"></div>
-                </div>
-                <div class="flx-table-row"
-                     v-for="file in systemObjects.files"
-                     v-bind:key="file.id"
-                     v-bind:data-path="file.name"
-                     v-on:dblclick="fileOpen(file.path)"
-                     v-on:click.stop="select($event)"
-                     data-selected=false>
-                    <object v-bind:data="icons.file" class="flx-table-row-item" data-type="icon"></object>
-                    <div class="flx-table-row-item" data-type="name">{{file.name}}</div>
-                    <div class="flx-table-row-item">{{file.type}}</div>
-                    <div class="flx-table-row-item" data-type="size">{{file.size}}</div>
-                    <div class="flx-table-row-item"></div>
-                </div>
+                <System-Entry
+                v-for="folder in systemObjects.folders"
+                v-bind:key="folder.id"
+                v-bind:data-path="folder.name"
+                v-bind:entryData="folder"
+                v-on:dblclick.native="folderOpen(folder.name)"
+                v-on:click.native.stop="select($event)"
+                ></System-Entry>
+
+                <SystemEntry
+                v-for="file in systemObjects.files"
+                v-bind:key="file.id"
+                v-bind:entryData="file"
+                v-on:dblclick.native="fileOpen(file.path)"
+                v-on:click.native.stop="select($event)"></SystemEntry>
             </section>
         </div>
     </main>
@@ -47,6 +35,7 @@
 
     import {mapState} from 'vuex'
     import Modal from './subcomponents/modal'
+    import SystemEntry from './MainView/file'
 
     const path = require('path')
     const fs = require('fs')
@@ -54,18 +43,23 @@
     export default {
 
         name: "mainVue",
-        components: {Modal},
+        components: {Modal, SystemEntry},
         directives: {
         },
         data() {
-
             return {
-
-                lockedFile: ['System Volume Information', 'pagefile.sys', '$RECYCLE.BIN'],
-                icons: {
-                    folder: 'static/icons/Folder-Main.svg',
-                    file: 'static/icons/File-Main.svg'
+                iconList: {
+                    'File': 'static/icons/File-Main.svg',
+                    'File Folder': 'static/icons/Folder-Main.svg'
                 },
+                lockedFile: [
+                    '$RECYCLE.BIN',
+                    '$Recycle.Bin',
+                    'Crash',
+                    'Documents and Settings',
+                    'MSOCache',
+                    'pagefile.sys',
+                    'System Volume Information'],
                 contextMenu: null
             }
         },
@@ -120,7 +114,8 @@
 
                                 id: id,
                                 name: fileData.name,
-                                type: 'File Folder'
+                                type: 'File Folder',
+                                icon: this.iconList['File Folder']
                             })
                         }
 
@@ -146,7 +141,8 @@
                                 name: fileData.name,
                                 type: fileData.ext.substring(1),
                                 path: fileData.name + fileData.ext,
-                                size: sizeString
+                                size: sizeString,
+                                icon: (fileData.ext.substring(1) in this.iconList) ? this.iconList[fileData.ext.substring(1)] : this.iconList['File']
                             })
                         }
 
@@ -162,8 +158,9 @@
 
             },
 
-            folderOpen(file) {
-                
+            folderOpen(file) { 
+
+                console.log(file)
                 this.$store.dispatch('updatePath', this.currentPath + `${file}\\`)
             },
 
@@ -176,7 +173,7 @@
 
                 let el = event.target
 
-                if (!el.classList.contains('flx-table-row')) el = el.parentNode
+                while (!el.classList.contains('flx-table-row')) el = el.parentNode
 
                 if (!event.ctrlKey) {
 
@@ -197,8 +194,16 @@
                 if (els.length >= 1) this.contextMenu.items[1].visible = true
                 if (els.length === 1) this.contextMenu.items[2].visible = true
 
-            }
+            },
 
+            rename(el) {
+                
+                console.log('1:', el)
+                el = el[0]
+                let x = el.getAttribute("data-path")
+                this.$events.emit(x, 'response')
+                
+            }
         },
         watch: {
 
@@ -211,9 +216,6 @@
 
         },
         mounted() {
-
-            this.$store.dispatch('setModalMsg', `Test Text`)
-            this.$store.dispatch('toggleModal')
 
             let Vue = this
 
@@ -271,13 +273,15 @@
 
                     let selected = document.querySelectorAll("[data-selected='true']")
 
-                    let currentPath = Vue.currentPath
-                    let oldPath = path.join(currentPath, selected[0].getAttribute('data-path'))
-                    let newPath = path.join(currentPath, 'renamed')
+                    Vue.rename(selected)
 
-                    fs.renameSync(oldPath, newPath)
+                    // let currentPath = Vue.currentPath
+                    // let oldPath = path.join(currentPath, selected[0].getAttribute('data-path'))
+                    // let newPath = path.join(currentPath, this.rename())
 
-                    Vue.contextMenu.items[2].visible = false
+                    // fs.renameSync(oldPath, newPath)
+
+                    // Vue.contextMenu.items[2].visible = false
                 }
             }))
     
