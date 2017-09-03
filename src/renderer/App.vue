@@ -1,7 +1,7 @@
 <template>
     <div id="app">
         <titlebar></titlebar>
-        <controls></controls>
+        <view-controller></view-controller>
         <router-view></router-view>
     </div>
 </template>
@@ -10,11 +10,12 @@
 
 import Titlebar from './components/titlebar'
 import Controls from './components/controls'
+import viewController from './components/viewController'
 
 export default {
 
     name: 'App',
-    components: {Titlebar, Controls},
+    components: {Titlebar, viewController},
 }
 </script>
 
